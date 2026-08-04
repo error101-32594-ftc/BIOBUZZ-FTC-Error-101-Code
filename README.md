@@ -1,5 +1,9 @@
 # Error 101 #32594
 
+## General Information
+
+This is the code for the 2026-2027 FTC Error 101 BIOBUZZ Season. It is a fork of last years season code, which was a former of the official FTC Driver Base code.
+
 ## DiagnosticsLogger (/TeamCode/src/main/java/.../DiagnosticsLogger.java)
 
 DiagnosticsLogger is a Runnable class our team made to be able to easily gather
