@@ -20,34 +20,44 @@ public class TeleOpMain extends LinearOpMode {
         while (opModeIsActive()) {
             // Sets up joystick & corr. motor movement for DRIVE controller
 
-            // Forward movement condition
-            if (gamepad1.left_stick_y <= -0.5 && gamepad1.left_stick_y >= -1.0) {
-                robot.leftRear.setPower(0.75);
-                robot.rightRear.setPower(0.75);
-                robot.leftFront.setPower(0.75);
-                robot.rightFront.setPower(0.75);
+            double joystickX = gamepad1.left_stick_x;
+            double joystickY = gamepad1.left_stick_y;
 
-            // Backward movement condition
-            } else if (gamepad1.left_stick_y >= 0.5 && gamepad1.left_stick_y <= 1.0) {
-                robot.leftRear.setPower(-0.75);
-                robot.rightRear.setPower(-0.75);
-                robot.leftFront.setPower(-0.75);
-                robot.rightFront.setPower(-0.75);
+            joystickY = -(joystickY); // invert y-axis (forward= +, backward= -)
+
+            if (Math.abs(joystickX) < 0.10) { // create deadzone for x-axis
+                joystickX = 0;
+            }
+            if (Math.abs(joystickY) < 0.10) { // create deadzone for y-axis
+                joystickY = 0;
             }
 
-            // Move left condition
-            if (gamepad1.left_stick_x <= -0.5 && gamepad1.left_stick_x >= -1.0) {
-                robot.leftRear.setPower(-0.75); // reverse
-                robot.rightRear.setPower(0.75);
-                robot.leftFront.setPower(0.75);
-                robot.rightFront.setPower(-0.75); // reverse
+            double defaultSpeed = 0.75;
+            double motorPower = joystickY * defaultSpeed;
+            double strafePower = joystickX * defaultSpeed;
 
-            // Move right condition
-            } else if (gamepad1.left_stick_x >= 0.5 && gamepad1.left_stick_x <= 1.0) {
-                robot.leftRear.setPower(0.75);
-                robot.rightRear.setPower(-0.75); // reverse
-                robot.leftFront.setPower(-0.75); // reverse
-                robot.rightFront.setPower(0.75);
+            if (Math.abs(joystickY) > 0.10) {
+                robot.rightRear.setPower(motorPower);
+                robot.leftRear.setPower(motorPower);
+                robot.rightFront.setPower(motorPower);
+                robot.leftFront.setPower(motorPower);
+            } else {
+                robot.rightRear.setPower(0);
+                robot.leftRear.setPower(0);
+                robot.rightFront.setPower(0);
+                robot.leftFront.setPower(0);
+            }
+
+            if (Math.abs(joystickX) > 0.10) {
+                robot.leftRear.setPower(-strafePower); // reverse
+                robot.rightRear.setPower(strafePower);
+                robot.leftFront.setPower(strafePower);
+                robot.rightFront.setPower(-strafePower); // reverse
+            } else {
+                robot.rightRear.setPower(0);
+                robot.leftRear.setPower(0);
+                robot.rightFront.setPower(0);
+                robot.leftFront.setPower(0);
             }
         }
 
