@@ -20,23 +20,25 @@ public class TeleOpMain extends LinearOpMode {
         while (opModeIsActive()) {
             // Sets up joystick & corr. motor movement for DRIVE controller
 
-            double joystickX = gamepad1.left_stick_x;
-            double joystickY = gamepad1.left_stick_y;
+            double leftJoystickX = gamepad1.left_stick_x;
+            double leftJoystickY = gamepad1.left_stick_y;
+            double rightJoystickX = gamepad1.right_stick_x;
 
-            joystickY = -(joystickY); // invert y-axis (forward= +, backward= -)
+            leftJoystickY = -(leftJoystickY); // invert y-axis (forward= +, backward= -)
 
-            if (Math.abs(joystickX) < 0.10) { // create deadzone for x-axis
-                joystickX = 0;
+            if (Math.abs(leftJoystickX) < 0.10) { // create deadzone for x-axis
+                leftJoystickX = 0;
             }
-            if (Math.abs(joystickY) < 0.10) { // create deadzone for y-axis
-                joystickY = 0;
+            if (Math.abs(leftJoystickY) < 0.10) { // create deadzone for y-axis
+                leftJoystickY = 0;
             }
 
             double defaultSpeed = 0.75;
-            double motorPower = joystickY * defaultSpeed;
-            double strafePower = joystickX * defaultSpeed;
+            double motorPower = leftJoystickY * defaultSpeed;
+            double strafePower = leftJoystickX * defaultSpeed;
+            double turnPower = rightJoystickX * defaultSpeed;
 
-            if (Math.abs(joystickY) > 0.10) {
+            if (Math.abs(leftJoystickY) > 0.10) {
                 robot.rightRear.setPower(motorPower);
                 robot.leftRear.setPower(motorPower);
                 robot.rightFront.setPower(motorPower);
@@ -48,11 +50,23 @@ public class TeleOpMain extends LinearOpMode {
                 robot.leftFront.setPower(0);
             }
 
-            if (Math.abs(joystickX) > 0.10) {
+            if (Math.abs(leftJoystickX) > 0.10) {
                 robot.leftRear.setPower(-strafePower); // reverse
                 robot.rightRear.setPower(strafePower);
                 robot.leftFront.setPower(strafePower);
                 robot.rightFront.setPower(-strafePower); // reverse
+            } else {
+                robot.rightRear.setPower(0);
+                robot.leftRear.setPower(0);
+                robot.rightFront.setPower(0);
+                robot.leftFront.setPower(0);
+            }
+
+            if (Math.abs(rightJoystickX) > 0.10) { // for left & right turns in place
+                robot.leftRear.setPower(robot.leftRear.getPower() + turnPower);
+                robot.leftFront.setPower(robot.leftFront.getPower() + turnPower);
+                robot.rightRear.setPower(robot.rightRear.getPower() - turnPower);
+                robot.rightFront.setPower(robot.rightFront.getPower() - turnPower);
             } else {
                 robot.rightRear.setPower(0);
                 robot.leftRear.setPower(0);
