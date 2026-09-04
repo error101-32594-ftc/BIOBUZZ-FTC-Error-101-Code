@@ -1,6 +1,8 @@
 // This is the main java class for the TeleOp controller-based code of the robot
 package org.firstinspires.ftc.teamcode;
 
+import android.view.DragAndDropPermissions;
+
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -32,47 +34,40 @@ public class TeleOpMain extends LinearOpMode {
             if (Math.abs(leftJoystickY) < 0.10) { // create deadzone for y-axis
                 leftJoystickY = 0;
             }
+            if (Math.abs(rightJoystickX) < 0.10) { // create deadzone for x-axis
+                rightJoystickX = 0;
+            }
 
             double defaultSpeed = 0.75;
             double motorPower = leftJoystickY * defaultSpeed;
             double strafePower = leftJoystickX * defaultSpeed;
             double turnPower = rightJoystickX * defaultSpeed;
 
-            if (Math.abs(leftJoystickY) > 0.10) {
-                robot.rightRear.setPower(motorPower);
-                robot.leftRear.setPower(motorPower);
-                robot.rightFront.setPower(motorPower);
-                robot.leftFront.setPower(motorPower);
-            } else {
-                robot.rightRear.setPower(0);
-                robot.leftRear.setPower(0);
-                robot.rightFront.setPower(0);
-                robot.leftFront.setPower(0);
-            }
+            // motor power (straight) stays same; aka constant
+            // left = +turn ; right = -turn
+            // strafe: diagonals are same, RF & LR = -, LF & RR = +
+            double leftFrontSpeed = motorPower + strafePower + turnPower;
+            double rightFrontSpeed = motorPower - strafePower - turnPower;
+            double leftRearSpeed = motorPower - strafePower + turnPower;
+            double rightRearSpeed = motorPower + strafePower - turnPower;
 
-            if (Math.abs(leftJoystickX) > 0.10) {
-                robot.leftRear.setPower(-strafePower); // reverse
-                robot.rightRear.setPower(strafePower);
-                robot.leftFront.setPower(strafePower);
-                robot.rightFront.setPower(-strafePower); // reverse
-            } else {
-                robot.rightRear.setPower(0);
-                robot.leftRear.setPower(0);
-                robot.rightFront.setPower(0);
-                robot.leftFront.setPower(0);
-            }
+            // Compares max powers to see which motor requires most speed
+            double maxPower = Math.max(1.0, Math.max(
+                    Math.max(leftFrontSpeed, rightFrontSpeed),
+                    Math.max(leftRearSpeed, rightRearSpeed)
+            ));
 
-            if (Math.abs(rightJoystickX) > 0.10) { // for left & right turns in place
-                robot.leftRear.setPower(robot.leftRear.getPower() + turnPower);
-                robot.leftFront.setPower(robot.leftFront.getPower() + turnPower);
-                robot.rightRear.setPower(robot.rightRear.getPower() - turnPower);
-                robot.rightFront.setPower(robot.rightFront.getPower() - turnPower);
-            } else {
-                robot.rightRear.setPower(0);
-                robot.leftRear.setPower(0);
-                robot.rightFront.setPower(0);
-                robot.leftFront.setPower(0);
-            }
+            // Proportionately scale down in case -1 <= power >= 1
+            leftFrontSpeed /= maxPower;
+            rightFrontSpeed /= maxPower;
+            leftRearSpeed /= maxPower;
+            rightRearSpeed /= maxPower;
+
+            // Set the finalized speeds to the respective motors
+            robot.leftFront.setPower(leftFrontSpeed);
+            robot.rightFront.setPower(rightFrontSpeed);
+            robot.leftRear.setPower(leftRearSpeed);
+            robot.rightRear.setPower(rightRearSpeed);
         }
 
     }
