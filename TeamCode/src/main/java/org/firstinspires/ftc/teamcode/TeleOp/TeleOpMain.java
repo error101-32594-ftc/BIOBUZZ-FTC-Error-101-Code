@@ -1,8 +1,6 @@
 // This is the main java class for the TeleOp controller-based code of the robot
 package org.firstinspires.ftc.teamcode;
 
-import android.view.DragAndDropPermissions;
-
 import com.qualcomm.robotcore.eventloop.opmode.LinearOpMode;
 import com.qualcomm.robotcore.eventloop.opmode.TeleOp;
 
@@ -25,6 +23,11 @@ public class TeleOpMain extends LinearOpMode {
             double leftJoystickX = gamepad1.left_stick_x;
             double leftJoystickY = gamepad1.left_stick_y;
             double rightJoystickX = gamepad1.right_stick_x;
+
+            // debug statements to report current joystick push headings
+            telemetry.addData("Left Joystick X:", leftJoystickX);
+            telemetry.addData("Left Joystick Y:", leftJoystickY);
+            telemetry.addData("Right Joystick X:", rightJoystickX);
 
             leftJoystickY = -(leftJoystickY); // invert y-axis (forward= +, backward= -)
 
@@ -51,10 +54,22 @@ public class TeleOpMain extends LinearOpMode {
             double leftRearSpeed = motorPower - strafePower + turnPower;
             double rightRearSpeed = motorPower + strafePower - turnPower;
 
+            // debug statements to report final motor powers
+            telemetry.addData("Left Front Speed", leftFrontSpeed);
+            telemetry.addData("Right Front Speed", rightFrontSpeed);
+            telemetry.addData("Left Rear Speed", leftRearSpeed);
+            telemetry.addData("Right Rear Speed", rightRearSpeed);
+
+            //String[] motorArray = {"Left Front", "Right Front",
+                                    //"Left Rear", "Right Rear"};
+
+            //double[] motorSpeedArray = {leftFrontSpeed, rightFrontSpeed,
+                                        //leftRearSpeed, rightRearSpeed};
+
             // Compares max powers to see which motor requires most speed
             double maxPower = Math.max(1.0, Math.max(
-                    Math.max(leftFrontSpeed, rightFrontSpeed),
-                    Math.max(leftRearSpeed, rightRearSpeed)
+                    Math.max(Math.abs(leftFrontSpeed), Math.abs(rightFrontSpeed)),
+                    Math.max(Math.abs(leftRearSpeed), Math.abs(rightRearSpeed))
             ));
 
             // Proportionately scale down in case -1 <= power >= 1
